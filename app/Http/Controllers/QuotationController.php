@@ -49,7 +49,7 @@ class QuotationController extends Controller
     public function store(SalesDocumentRequest $request): RedirectResponse
     {
         $quotation = DB::transaction(function () use ($request) {
-            $quotation = Quotation::create($request->header() + ['user_id' => $request->user()->id, 'status' => 'draft']);
+            $quotation = Quotation::create($request->documentAttributes() + ['user_id' => $request->user()->id, 'status' => 'draft']);
             $quotation->syncItems($request->items());
             $quotation->logActivity('Quotation created', 'system');
 
@@ -90,7 +90,7 @@ class QuotationController extends Controller
         abort_if($quotation->status === 'converted', 422, 'Converted quotations cannot be edited.');
 
         DB::transaction(function () use ($request, $quotation) {
-            $quotation->update($request->header());
+            $quotation->update($request->documentAttributes());
             $quotation->syncItems($request->items());
             $quotation->logActivity('Quotation revised – new total '.money($quotation->total), 'system');
         });

@@ -51,7 +51,7 @@ class SalesOrderController extends Controller
     public function store(SalesDocumentRequest $request): RedirectResponse
     {
         $order = DB::transaction(function () use ($request) {
-            $order = SalesOrder::create($request->header() + ['user_id' => $request->user()->id, 'status' => 'pending']);
+            $order = SalesOrder::create($request->documentAttributes() + ['user_id' => $request->user()->id, 'status' => 'pending']);
             $order->syncItems($request->items());
             $order->logActivity('Order created', 'system');
 
@@ -90,7 +90,7 @@ class SalesOrderController extends Controller
         abort_if($order->isLocked(), 422, 'Order is locked.');
 
         DB::transaction(function () use ($request, $order) {
-            $order->update($request->header());
+            $order->update($request->documentAttributes());
             $order->syncItems($request->items());
             $order->refreshPaymentStatus();
             $order->logActivity('Order revised – new total '.money($order->total), 'system');

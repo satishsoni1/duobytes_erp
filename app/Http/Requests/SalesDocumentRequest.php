@@ -63,7 +63,7 @@ class SalesDocumentRequest extends FormRequest
     /**
      * @return array<string, mixed>
      */
-    public function header(): array
+    public function documentAttributes(): array
     {
         return collect($this->validated())->except('items')->all();
     }
